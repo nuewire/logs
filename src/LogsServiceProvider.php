@@ -63,9 +63,9 @@ final class LogsServiceProvider extends ServiceProvider
     private function registerLivewireComponents(): void
     {
         $registrar = $this->app->make(LivewireComponentRegistrar::class);
-        $registrar->register('nuewire::audit-trails', AuditTrails::class);
-        $registrar->register('nuewire::request-logs', RequestLogs::class);
-        $registrar->register('nuewire::system-logs', SystemLogs::class);
+        $registrar->register('nuewire-audit-trails', AuditTrails::class);
+        $registrar->register('nuewire-request-logs', RequestLogs::class);
+        $registrar->register('nuewire-system-logs', SystemLogs::class);
     }
 
     private function registerRequestMiddleware(): void
@@ -98,7 +98,7 @@ final class LogsServiceProvider extends ServiceProvider
                     'label' => ['id' => 'Audit Trails', 'en' => 'Audit Trails'],
                     'description' => ['id' => 'Jejak perubahan dan tindakan pengguna.', 'en' => 'User actions and model change history.'],
                     'group' => $group,
-                    'component' => 'nuewire::audit-trails',
+                    'component' => 'nuewire-audit-trails',
                     'permission' => 'logs.audit.view',
                     'icon' => 'A',
                     'order' => 10,
@@ -107,7 +107,7 @@ final class LogsServiceProvider extends ServiceProvider
                     'label' => ['id' => 'Request Logs', 'en' => 'Request Logs'],
                     'description' => ['id' => 'Permintaan HTTP, status, dan durasi.', 'en' => 'HTTP requests, statuses, and duration.'],
                     'group' => $group,
-                    'component' => 'nuewire::request-logs',
+                    'component' => 'nuewire-request-logs',
                     'permission' => 'logs.requests.view',
                     'icon' => 'R',
                     'order' => 20,
@@ -116,7 +116,7 @@ final class LogsServiceProvider extends ServiceProvider
                     'label' => ['id' => 'System Logs', 'en' => 'System Logs'],
                     'description' => ['id' => 'Baca file log Laravel secara aman.', 'en' => 'Safely inspect Laravel log files.'],
                     'group' => $group,
-                    'component' => 'nuewire::system-logs',
+                    'component' => 'nuewire-system-logs',
                     'permission' => 'logs.system.view',
                     'icon' => 'S',
                     'order' => 30,
@@ -131,7 +131,7 @@ final class LogsServiceProvider extends ServiceProvider
                 'slug' => 'system-logs',
                 'label' => ['id' => 'System Logs', 'en' => 'System Logs'],
                 'description' => ['id' => 'Baca file log Laravel secara aman.', 'en' => 'Safely inspect Laravel log files.'],
-                'component' => 'nuewire::system-logs',
+                'component' => 'nuewire-system-logs',
                 'permission' => 'logs.system.view',
                 'icon' => 'system-log',
                 'order' => 10,
@@ -143,7 +143,7 @@ final class LogsServiceProvider extends ServiceProvider
                 'slug' => 'request-logs',
                 'label' => ['id' => 'Request Logs', 'en' => 'Request Logs'],
                 'description' => ['id' => 'Permintaan HTTP, status, dan durasi.', 'en' => 'HTTP requests, statuses, and duration.'],
-                'component' => 'nuewire::request-logs',
+                'component' => 'nuewire-request-logs',
                 'permission' => 'logs.requests.view',
                 'icon' => 'request-log',
                 'order' => 20,
@@ -155,7 +155,7 @@ final class LogsServiceProvider extends ServiceProvider
                 'slug' => 'audit-trails',
                 'label' => ['id' => 'Audit Trails', 'en' => 'Audit Trails'],
                 'description' => ['id' => 'Jejak perubahan dan tindakan pengguna.', 'en' => 'User actions and model change history.'],
-                'component' => 'nuewire::audit-trails',
+                'component' => 'nuewire-audit-trails',
                 'permission' => 'logs.audit.view',
                 'icon' => 'audit',
                 'order' => 30,

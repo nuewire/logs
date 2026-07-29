@@ -20,7 +20,7 @@ final class PlatformNavigationRegistrationTest extends TestCase
         );
         self::assertSame('settings', $registry->pages['logs.system']['area']);
         self::assertSame('platform', $registry->pages['logs.system']['group']);
-        self::assertSame('nuewire::request-logs', $registry->pages['logs.requests']['component']);
+        self::assertSame('nuewire-request-logs', $registry->pages['logs.requests']['component']);
         self::assertSame(30, $registry->pages['logs.audit']['order']);
     }
 }

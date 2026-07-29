@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 - 2026-07-29
+
+- Replaced all `nuewire::` Livewire runtime aliases with portable flat aliases for Livewire 4 compatibility.
+
 ## 1.1.0 - 2026-07-29
 
 - Moved System Logs, Request Logs, and Audit Trails to Settings → Platform.

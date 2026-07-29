@@ -42,9 +42,9 @@ php artisan migrate
 ## Components
 
 ```blade
-<livewire:nuewire::audit-trails />
-<livewire:nuewire::request-logs />
-<livewire:nuewire::system-logs />
+<livewire:nuewire-audit-trails />
+<livewire:nuewire-request-logs />
+<livewire:nuewire-system-logs />
 ```
 
 With `nuewire/platform` 2, these components appear automatically as:
