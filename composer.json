@@ -1,0 +1,65 @@
+{
+    "name": "nuewire/logs",
+    "description": "Platform audit trails, HTTP request logs, and Laravel system log viewer for Nuewire.",
+    "keywords": [
+        "laravel",
+        "livewire",
+        "activity-log",
+        "audit-trail",
+        "request-log",
+        "system-log"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nuewire"
+        }
+    ],
+    "require": {
+        "illuminate/auth": "^11.0|^12.0|^13.0",
+        "illuminate/console": "^11.0|^12.0|^13.0",
+        "illuminate/contracts": "^11.0|^12.0|^13.0",
+        "illuminate/database": "^11.0|^12.0|^13.0",
+        "illuminate/filesystem": "^11.0|^12.0|^13.0",
+        "illuminate/http": "^11.0|^12.0|^13.0",
+        "illuminate/pagination": "^11.0|^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "illuminate/translation": "^11.0|^12.0|^13.0",
+        "illuminate/view": "^11.0|^12.0|^13.0",
+        "livewire/livewire": "^3.6|^4.0.3",
+        "nuewire/support": "^1.0",
+        "php": "^8.2",
+        "spatie/laravel-activitylog": "^4.10.2|^5.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "phpunit/phpunit": "^11.0|^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nuewire\\Logs\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nuewire\\Logs\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Nuewire\\Logs\\LogsServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "suggest": {
+        "nuewire/platform": "Adds System Logs, Request Logs, and Audit Trails under Settings > Platform.",
+        "nuewire/acl": "Adds granular permissions for each logs page and destructive log actions."
+    }
+}
