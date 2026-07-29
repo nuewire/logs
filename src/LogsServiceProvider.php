@@ -35,6 +35,7 @@ final class LogsServiceProvider extends ServiceProvider
         }
 
         $this->registerPlatformNavigation();
+        $this->registerPlatformDashboard();
         $this->registerAclPermissions();
     }
 
@@ -159,6 +160,166 @@ final class LogsServiceProvider extends ServiceProvider
                 'permission' => 'logs.audit.view',
                 'icon' => 'audit',
                 'order' => 30,
+            ]);
+        });
+    }
+
+
+    private function registerPlatformDashboard(): void
+    {
+        $registryClass = 'Nuewire\\Platform\\Dashboard\\DashboardRegistry';
+
+        $this->app->afterResolving($registryClass, static function (object $registry): void {
+            if (! method_exists($registry, 'register')) {
+                return;
+            }
+
+            if (method_exists($registry, 'registerGroup')) {
+                $registry->registerGroup('monitoring', [
+                    'label' => ['id' => 'Monitoring', 'en' => 'Monitoring'],
+                    'order' => 40,
+                ]);
+            }
+
+            $requestLogAvailable = static function (): bool {
+                try {
+                    $connection = trim((string) config('nuewire.logs.request.connection', ''));
+                    return \Illuminate\Support\Facades\Schema::connection($connection !== '' ? $connection : null)
+                        ->hasTable((string) config('nuewire.logs.request.table', 'nuewire_request_logs'));
+                } catch (\Throwable) {
+                    return false;
+                }
+            };
+
+            $registry->register('logs.request-health', [
+                'group' => 'monitoring',
+                'label' => ['id' => 'Aktivitas Request', 'en' => 'Request Activity'],
+                'description' => ['id' => 'Volume request HTTP dalam periode pilihan.', 'en' => 'HTTP request volume during the selected period.'],
+                'type' => 'chart',
+                'permission' => 'logs.requests.view',
+                'visible' => $requestLogAvailable,
+                'width' => 8,
+                'min_width' => 6,
+                'default' => true,
+                'cache_ttl' => 300,
+                'cache_scope' => 'global',
+                'refresh_interval' => 300,
+                'settings' => [
+                    'period' => [
+                        'type' => 'select',
+                        'label' => ['id' => 'Periode', 'en' => 'Period'],
+                        'options' => [
+                            '24h' => ['id' => '24 jam', 'en' => '24 hours'],
+                            '7d' => ['id' => '7 hari', 'en' => '7 days'],
+                            '30d' => ['id' => '30 hari', 'en' => '30 days'],
+                        ],
+                        'default' => '24h',
+                    ],
+                ],
+                'default_settings' => ['period' => '24h'],
+                'resolver' => static function (object $context): array {
+                    $period = (string) ($context->settings['period'] ?? '24h');
+                    $points = $period === '24h' ? 12 : ($period === '7d' ? 7 : 10);
+                    $stepHours = $period === '24h' ? 2 : ($period === '7d' ? 24 : 72);
+                    $labels = [];
+                    $values = [];
+                    $total = 0;
+                    $start = now()->subHours($points * $stepHours);
+
+                    for ($index = 0; $index < $points; $index++) {
+                        $from = $start->copy()->addHours($index * $stepHours);
+                        $to = $from->copy()->addHours($stepHours);
+                        $count = \Nuewire\Logs\Models\RequestLog::query()->whereBetween('created_at', [$from, $to])->count();
+                        $labels[] = $stepHours < 24 ? $from->format('H:i') : $from->format('d M');
+                        $values[] = $count;
+                        $total += $count;
+                    }
+
+                    return [
+                        'labels' => $labels,
+                        'values' => $values,
+                        'meta' => number_format($total).' '.($context->locale === 'en' ? 'requests in period' : 'request pada periode'),
+                    ];
+                },
+                'order' => 10,
+            ]);
+
+            $registry->register('logs.error-rate', [
+                'group' => 'monitoring',
+                'label' => ['id' => 'Error Request', 'en' => 'Request Errors'],
+                'description' => ['id' => 'Persentase response HTTP 5xx selama 24 jam.', 'en' => 'Percentage of HTTP 5xx responses during 24 hours.'],
+                'type' => 'stat',
+                'permission' => 'logs.requests.view',
+                'visible' => $requestLogAvailable,
+                'width' => 3,
+                'default' => true,
+                'cache_ttl' => 300,
+                'cache_scope' => 'global',
+                'refresh_interval' => 300,
+                'resolver' => static function (object $context): array {
+                    $query = \Nuewire\Logs\Models\RequestLog::query()->where('created_at', '>=', now()->subDay());
+                    $total = (clone $query)->count();
+                    $errors = (clone $query)->where('status_code', '>=', 500)->count();
+                    $rate = $total > 0 ? ($errors / $total) * 100 : 0;
+
+                    return [
+                        'value' => number_format($rate, 1).'%',
+                        'meta' => number_format($errors).' / '.number_format($total).' '.($context->locale === 'en' ? 'requests' : 'request'),
+                        'url' => $context->route('settings', 'request-logs'),
+                    ];
+                },
+                'order' => 20,
+            ]);
+
+            $registry->register('logs.recent-system-errors', [
+                'group' => 'monitoring',
+                'label' => ['id' => 'Error Sistem Terbaru', 'en' => 'Recent System Errors'],
+                'description' => ['id' => 'Request gagal terbaru dengan status 5xx atau exception.', 'en' => 'Latest failed requests with 5xx status or exceptions.'],
+                'type' => 'feed',
+                'permission' => 'logs.requests.view',
+                'visible' => $requestLogAvailable,
+                'width' => 8,
+                'default' => true,
+                'cache_ttl' => 120,
+                'cache_scope' => 'global',
+                'resolver' => static function (object $context): array {
+                    $url = $context->route('settings', 'request-logs');
+                    $items = \Nuewire\Logs\Models\RequestLog::query()
+                        ->where(static fn ($query) => $query->where('status_code', '>=', 500)->orWhereNotNull('exception_class'))
+                        ->latest('created_at')->limit(6)->get()->map(static fn ($log): array => [
+                            'title' => $log->method.' '.$log->path,
+                            'meta' => $log->status_code.' · '.optional($log->created_at)->format('Y-m-d H:i:s').' · '.($log->exception_class ?: $log->duration_ms.' ms'),
+                            'url' => $url,
+                        ])->all();
+
+                    return ['items' => $items, 'empty' => $context->locale === 'en' ? 'No recent server errors.' : 'Tidak ada error server terbaru.'];
+                },
+                'order' => 30,
+            ]);
+
+            $registry->register('logs.recent-audits', [
+                'group' => 'monitoring',
+                'label' => ['id' => 'Audit Terbaru', 'en' => 'Recent Audits'],
+                'description' => ['id' => 'Aktivitas terbaru dari Spatie Activitylog.', 'en' => 'Latest activities from Spatie Activitylog.'],
+                'type' => 'feed',
+                'permission' => 'logs.audit.view',
+                'visible' => static fn (): bool => class_exists('Spatie\\Activitylog\\Models\\Activity'),
+                'width' => 4,
+                'default' => true,
+                'cache_ttl' => 120,
+                'cache_scope' => 'global',
+                'resolver' => static function (object $context): array {
+                    $class = 'Spatie\\Activitylog\\Models\\Activity';
+                    $url = $context->route('settings', 'audit-trails');
+                    $items = $class::query()->latest('id')->limit(6)->get()->map(static fn ($activity): array => [
+                        'title' => (string) ($activity->description ?: $activity->event ?: 'activity'),
+                        'meta' => (string) ($activity->log_name ?: 'default').' · '.optional($activity->created_at)->format('Y-m-d H:i:s'),
+                        'url' => $url,
+                    ])->all();
+
+                    return ['items' => $items, 'empty' => $context->locale === 'en' ? 'No audit trail yet.' : 'Belum ada audit trail.'];
+                },
+                'order' => 40,
             ]);
         });
     }

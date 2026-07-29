@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- Added request activity, request error rate, recent server errors, and recent audit dashboard widgets.
+
 ## 1.1.1 - 2026-07-29
 
 - Replaced all `nuewire::` Livewire runtime aliases with portable flat aliases for Livewire 4 compatibility.
