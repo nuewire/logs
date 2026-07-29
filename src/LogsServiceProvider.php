@@ -127,7 +127,7 @@ final class LogsServiceProvider extends ServiceProvider
             }
 
             $registry->register('logs.system', [
-                'area' => 'settings',
+                'area' => 'plugin',
                 'group' => 'platform',
                 'slug' => 'system-logs',
                 'label' => ['id' => 'System Logs', 'en' => 'System Logs'],
@@ -139,7 +139,7 @@ final class LogsServiceProvider extends ServiceProvider
             ]);
 
             $registry->register('logs.requests', [
-                'area' => 'settings',
+                'area' => 'plugin',
                 'group' => 'platform',
                 'slug' => 'request-logs',
                 'label' => ['id' => 'Request Logs', 'en' => 'Request Logs'],
@@ -151,7 +151,7 @@ final class LogsServiceProvider extends ServiceProvider
             ]);
 
             $registry->register('logs.audit', [
-                'area' => 'settings',
+                'area' => 'plugin',
                 'group' => 'platform',
                 'slug' => 'audit-trails',
                 'label' => ['id' => 'Audit Trails', 'en' => 'Audit Trails'],
@@ -265,7 +265,7 @@ final class LogsServiceProvider extends ServiceProvider
                     return [
                         'value' => number_format($rate, 1).'%',
                         'meta' => number_format($errors).' / '.number_format($total).' '.($context->locale === 'en' ? 'requests' : 'request'),
-                        'url' => $context->route('settings', 'request-logs'),
+                        'url' => $context->route('plugin', 'request-logs'),
                     ];
                 },
                 'order' => 20,
@@ -283,7 +283,7 @@ final class LogsServiceProvider extends ServiceProvider
                 'cache_ttl' => 120,
                 'cache_scope' => 'global',
                 'resolver' => static function (object $context): array {
-                    $url = $context->route('settings', 'request-logs');
+                    $url = $context->route('plugin', 'request-logs');
                     $items = \Nuewire\Logs\Models\RequestLog::query()
                         ->where(static fn ($query) => $query->where('status_code', '>=', 500)->orWhereNotNull('exception_class'))
                         ->latest('created_at')->limit(6)->get()->map(static fn ($log): array => [
@@ -310,7 +310,7 @@ final class LogsServiceProvider extends ServiceProvider
                 'cache_scope' => 'global',
                 'resolver' => static function (object $context): array {
                     $class = 'Spatie\\Activitylog\\Models\\Activity';
-                    $url = $context->route('settings', 'audit-trails');
+                    $url = $context->route('plugin', 'audit-trails');
                     $items = $class::query()->latest('id')->limit(6)->get()->map(static fn ($activity): array => [
                         'title' => (string) ($activity->description ?: $activity->event ?: 'activity'),
                         'meta' => (string) ($activity->log_name ?: 'default').' · '.optional($activity->created_at)->format('Y-m-d H:i:s'),

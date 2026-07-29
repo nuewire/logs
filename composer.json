@@ -59,7 +59,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "suggest": {
-        "nuewire/platform": "Adds System Logs, Request Logs, and Audit Trails under Settings > Platform.",
+        "nuewire/platform": "Adds System Logs, Request Logs, and Audit Trails under Plugin > Platform.",
         "nuewire/acl": "Adds granular permissions for each logs page and destructive log actions."
     }
 }

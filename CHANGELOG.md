@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1
+
+- Moved System Logs, Request Logs, and Audit Trails to Plugin → Platform.
+- Updated dashboard links to the new canonical Plugin URLs.
+- Kept old Settings URLs redirecting through Platform's canonical resolver.
+
 ## 1.2.0
 
 - Added request activity, request error rate, recent server errors, and recent audit dashboard widgets.

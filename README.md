@@ -4,7 +4,7 @@ Platform logging package for the Nuewire Laravel suite.
 
 Panduan implementasi berbahasa Indonesia tersedia di [`docs/PANDUAN.md`](docs/PANDUAN.md).
 
-It registers three pages under **Settings → Platform** when `nuewire/platform` 2 is installed:
+It registers three pages under **Plugin → Platform** when `nuewire/platform` 2 is installed:
 
 - **Audit Trails** — user actions and model changes through `spatie/laravel-activitylog`.
 - **Request Logs** — HTTP method, path, route, status, duration, user, IP, and optional sanitized request data.
@@ -50,7 +50,7 @@ php artisan migrate
 With `nuewire/platform` 2, these components appear automatically as:
 
 ```text
-Settings
+Plugin
 └── Platform
     ├── System Logs
     ├── Request Logs

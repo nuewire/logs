@@ -6,7 +6,7 @@ namespace Nuewire\Logs\Tests;
 
 final class PlatformNavigationRegistrationTest extends TestCase
 {
-    public function test_three_log_pages_are_registered_under_settings_platform(): void
+    public function test_three_log_pages_are_registered_under_plugin_platform(): void
     {
         $abstract = 'Nuewire\\Platform\\Navigation\\NavigationRegistry';
         $this->app->singleton($abstract, static fn (): FakeLogsNavigationRegistry => new FakeLogsNavigationRegistry());
@@ -18,7 +18,7 @@ final class PlatformNavigationRegistrationTest extends TestCase
             ['logs.system', 'logs.requests', 'logs.audit'],
             array_keys($registry->pages),
         );
-        self::assertSame('settings', $registry->pages['logs.system']['area']);
+        self::assertSame('plugin', $registry->pages['logs.system']['area']);
         self::assertSame('platform', $registry->pages['logs.system']['group']);
         self::assertSame('nuewire-request-logs', $registry->pages['logs.requests']['component']);
         self::assertSame(30, $registry->pages['logs.audit']['order']);

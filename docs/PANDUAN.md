@@ -2,7 +2,7 @@
 
 ## Ruang lingkup
 
-Package `nuewire/logs` menambahkan tiga halaman pada **Settings → Platform** di `nuewire/platform` 2:
+Package `nuewire/logs` menambahkan tiga halaman pada **Plugin → Platform** di `nuewire/platform` 2:
 
 ```text
 Settings
